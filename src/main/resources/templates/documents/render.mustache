@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>문서 렌더링 - 플라이웨이트 패턴 예제</title>
+    <link href="/css/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖼️ 문서 렌더링 결과</h1>
+            <p>플라이웨이트 패턴으로 각 문자가 렌더링됩니다</p>
+        </div>
+        
+        <div class="cache-info">
+            <h3>📊 렌더링 통계</h3>
+            <p>문서 제목: <strong>{{document.title}}</strong></p>
+            <p>문자 수: <strong>{{document.content.length}}</strong></p>
+            <p>캐시된 문자 수: <strong>{{cacheSize}}</strong></p>
+            <p style="color: #28a745;">
+                {{#document.content}}
+                    {{#cacheSize}}
+                        메모리 효율성: {{document.content.length}} 개의 문자를 {{cacheSize}} 개의 객체로 관리
+                    {{/cacheSize}}
+                {{/document.content}}
+            </p>
+        </div>
+        
+        <div class="rendered-content">
+            <h3>🎨 렌더링된 문자들 (각 문자의 위치 정보)</h3>
+            {{#renderedCharacters}}
+            <div style="margin: 2px 0; padding: 2px 5px; background-color: #f8f9fa; border-radius: 2px;">{{.}}</div>
+            {{/renderedCharacters}}
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/documents" class="btn">📋 문서 목록으로</a>
+            <form action="/documents/clear-cache" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" onclick="return confirmClearCache()">🗑️ 캐시 초기화</button>
+            </form>
+        </div>
+        
+        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 4px; margin-top: 20px;">
+            <h4>💡 플라이웨이트 패턴 설명</h4>
+            <ul style="text-align: left;">
+                <li><strong>Intrinsic State (고유 상태):</strong> 각 문자 자체 ('A', 'B', 'C' 등)</li>
+                <li><strong>Extrinsic State (외부 상태):</strong> 위치, 색상, 폰트 크기 등</li>
+                <li><strong>효과:</strong> 동일한 문자가 여러 번 나타나도 하나의 객체만 생성됨</li>
+                <li><strong>메모리 절약:</strong> 1000자 문서도 최대 26개(알파벳) + 10개(숫자) + α 객체만 필요</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

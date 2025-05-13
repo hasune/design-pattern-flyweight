@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>문서 관리 - 플라이웨이트 패턴 예제</title>
+    <link href="/css/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 문서 관리 시스템</h1>
+            <p>플라이웨이트 패턴을 활용한 문자 렌더링 시스템</p>
+        </div>
+        
+        <div class="cache-info">
+            <h3>💾 플라이웨이트 캐시 상태</h3>
+            <p>현재 캐시된 문자 수: <strong>{{cacheSize}}</strong></p>
+            <p>동일한 문자가 나타날 때마다 캐시된 객체를 재사용합니다.</p>
+            <form action="/documents/clear-cache" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" onclick="return confirmClearCache()">캐시 초기화</button>
+            </form>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="/documents/create" class="btn">📝 새 문서 작성</a>
+            <a href="/database" class="btn btn-secondary">🏊‍♀️ 연결 풀 예제</a>
+        </div>
+        
+        <div id="documentList">
+            <h2>📚 문서 목록</h2>
+            {{#documents}}
+            <div class="document-item">
+                <div class="document-title">{{title}}</div>
+                <div class="document-meta">
+                    작성일: {{formattedCreatedAt}} | 수정일: {{formattedUpdatedAt}}
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/documents/{{id}}/render" class="btn">🖼️ 렌더링 보기</a>
+                </div>
+            </div>
+            {{/documents}}
+            {{^documents}}
+            <p style="text-align: center; color: #666;">아직 작성된 문서가 없습니다.</p>
+            {{/documents}}
+        </div>
+    </div>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

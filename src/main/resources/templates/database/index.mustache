@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>데이터베이스 연결 풀 - 플라이웨이트 패턴 예제</title>
+    <link href="/css/main.css" rel="stylesheet" type="text/css">
+    <style>
+        .connection-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .connection-box {
+            width: 120px;
+            height: 80px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+        .connection-active {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        .connection-available {
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .query-result {
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏊‍♀️ 데이터베이스 연결 풀</h1>
+            <p>플라이웨이트 패턴을 활용한 Connection Pool 관리</p>
+        </div>
+        
+        <div class="cache-info">
+            <h3>📊 연결 풀 상태</h3>
+            <p>전체 연결 수: <strong>{{poolSize}}</strong></p>
+            <p>사용 중인 연결: <strong>{{activeConnections}}</strong></p>
+            <p>사용 가능한 연결: <strong>{{availableConnections}}</strong></p>
+        </div>
+        
+        <div class="connection-pool">
+            {{#poolSize}}
+            <div class="connection-box" id="connection-{{.}}">
+                <div>연결 #{{.}}</div>
+                <div class="connection-status">대기중</div>
+            </div>
+            {{/poolSize}}
+        </div>
+        
+        <div class="form-group">
+            <h3>🔍 쿼리 실행</h3>
+            <input type="text" id="queryInput" placeholder="실행할 쿼리를 입력하세요 (예: SELECT * FROM users)" style="width: 70%; padding: 8px;">
+            <button onclick="executeQuery()" class="btn">쿼리 실행</button>
+        </div>
+        
+        <div class="query-result" id="queryResult" style="display: none;">
+            <h4>실행 결과</h4>
+            <div id="resultContent"></div>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="updateStatus()" class="btn btn-secondary">풀 상태 업데이트</button>
+            <form action="/database/close-all" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" onclick="return confirm('모든 연결을 해제하시겠습니까?')">
+                    모든 연결 해제
+                </button>
+            </form>
+        </div>
+        
+        <div style="background-color: #f0f7ff; padding: 15px; border-radius: 4px;">
+            <h4>💡 플라이웨이트 패턴 in 연결 풀</h4>
+            <ul style="text-align: left;">
+                <li><strong>Intrinsic State:</strong> 호스트 정보, 포트, 연결 방식 (모든 연결에서 공통)</li>
+                <li><strong>Extrinsic State:</strong> 사용 중 여부, 현재 트랜잭션 정보 (각 요청마다 다름)</li>
+                <li><strong>플라이웨이트 재사용:</strong> 연결 객체를 미리 생성해두고 재사용</li>
+                <li><strong>메모리 효율성:</strong> 1000개 요청이 있어도 5개 연결만 생성하여 처리</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/documents" class="btn">📝 문서 예제로 돌아가기</a>
+        </div>
+    </div>
+    
+    <script>
+        function executeQuery() {
+            const query = document.getElementById('queryInput').value;
+            if (!query.trim()) {
+                alert('쿼리를 입력해주세요.');
+                return;
+            }
+            
+            fetch('/database/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'query=' + encodeURIComponent(query)
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('resultContent').textContent = data;
+                document.getElementById('queryResult').style.display = 'block';
+                updateStatus();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('resultContent').textContent = '오류 발생: ' + error.message;
+                document.getElementById('queryResult').style.display = 'block';
+            });
+        }
+        
+        function updateStatus() {
+            fetch('/database/status')
+            .then(response => response.text())
+            .then(data => {
+                // 상태 업데이트 로직
+                console.log('Pool status:', data);
+                // 실제로는 페이지를 새로고침하는 것이 더 간단합니다
+                location.reload();
+            });
+        }
+        
+        // Enter 키로 쿼리 실행
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                executeQuery();
+            }
+        });
+    </script>
+</body>
+</html>
