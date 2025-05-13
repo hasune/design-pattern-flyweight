@@ -271,7 +271,6 @@ graph LR
 
 *"좋은 아키텍처는 기능을 구현하는 것이 아니라 문제를 해결하는 것이다"*
 
-[![GitHub Stars](https://img.shields.io/github/stars/username/repo?style=social)](https://github.com/username/repo)
 [![Made with Spring Boot](https://img.shields.io/badge/Made_with-Spring_Boot-green.svg)](https://spring.io/projects/spring-boot)
 
 </div>
